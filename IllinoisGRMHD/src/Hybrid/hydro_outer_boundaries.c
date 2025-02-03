@@ -159,7 +159,7 @@ void IllinoisGRMHD_hybrid_hydro_outer_boundaries(CCTK_ARGUMENTS) {
       }
     }
     // k=kmin=outer boundary
-    if((cctk_bbox[4]) && Symmetry_none) {
+    if((cctk_bbox[4]) && Symmetry_none && !zsymmetry) {
       const int kmin = cctk_nghostzones[2] - which_bdry_pt - 1;
 #pragma omp parallel for
       for(int j=0; j<cctk_lsh[1]; j++) {
@@ -176,6 +176,28 @@ void IllinoisGRMHD_hybrid_hydro_outer_boundaries(CCTK_ARGUMENTS) {
           prims.BU[0] = Bx_center[index];
           prims.BU[1] = By_center[index];
           prims.BU[2] = Bz_center[index];
+
+          IllinoisGRMHD_hybrid_enforce_primitive_limits_and_compute_conservs(cctkGH, index, &prims);
+        }
+      }
+    }
+  }
+  if((cctk_bbox[4]) && zsymmetry) {
+    for(int k = 0 ; k < cctk_nghostzones[2] ; k++) {
+      for(int j = 0 ; j < cctk_lsh[1] ; j++) {
+        for(int i = 0 ; i < cctk_lsh[0] ; i++) {
+          int index = CCTK_GFINDEX3D(cctkGH, i,j,k);
+          int idx_mirror = CCTK_GFINDEX3D(cctkGH, i,j,2*cctk_nghostzones[2] - k);
+
+          ghl_primitive_quantities prims;
+          prims.rho   = +rho[idx_mirror];
+          prims.press = +press[idx_mirror];
+          prims.vU[0] = +vx[idx_mirror];
+          prims.vU[1] = +vy[idx_mirror];
+          prims.vU[2] = -vz[idx_mirror];
+          prims.BU[0] = 0;
+          prims.BU[1] = 0;
+          prims.BU[2] = 0;
 
           IllinoisGRMHD_hybrid_enforce_primitive_limits_and_compute_conservs(cctkGH, index, &prims);
         }

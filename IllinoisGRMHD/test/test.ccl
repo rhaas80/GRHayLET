@@ -1,6 +1,11 @@
 ABSTOL 1e-11
 RELTOL 1e-11
 
+TEST TOV-sym
+{
+  NPROCS 1
+}
+
 TEST TOV
 { 
 }

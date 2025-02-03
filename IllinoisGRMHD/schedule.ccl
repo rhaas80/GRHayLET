@@ -127,6 +127,11 @@ schedule IllinoisGRMHD_sync in IllinoisGRMHD_Con2Prim as IllinoisGRMHD_sync_cons
   SYNC: grmhd_conservatives, Ye_star, ent_star, Ax, Ay, Az, phitilde
 } "Sync conservative variable ghost zones for c2p routine"
 
+schedule IllinoisGRMHD_symmetry in IllinoisGRMHD_Con2Prim after IllinoisGRMHD_sync_conservatives before IllinoisGRMHD_A_i_outer_boundaries
+{
+  LANG: C
+} "apply symmetry"
+
 schedule IllinoisGRMHD_A_i_outer_boundaries in IllinoisGRMHD_Con2Prim after IllinoisGRMHD_sync
 {
   LANG: C
